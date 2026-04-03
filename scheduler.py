@@ -4,21 +4,21 @@ import random
 import requests
 import json
 import os
+import re
 import logging
 from bs4 import BeautifulSoup
 
 # ─────────────────────────────────────────────
-# CONFIGURATION — Edit these values
+# CONFIGURATION
 # ─────────────────────────────────────────────
 PINTEREST_ACCESS_TOKEN = os.environ.get("PINTEREST_ACCESS_TOKEN", "YOUR_PINTEREST_ACCESS_TOKEN")
 PINTEREST_BOARD_ID     = os.environ.get("PINTEREST_BOARD_ID", "YOUR_BOARD_ID")
 CSV_FILE               = "products.csv"
 PINS_PER_RUN           = 30
-DELAY_BETWEEN_PINS     = 60  # seconds
+DELAY_BETWEEN_PINS     = 60
 LOG_FILE               = "activity_log.txt"
 # ─────────────────────────────────────────────
 
-# Amazon catchy titles
 AMAZON_TITLES = [
     "This Amazon Deal Is Actually Worth Buying",
     "Amazon Favorite That Changed My Routine",
@@ -71,39 +71,40 @@ AMAZON_TITLES = [
     "Amazon Product Everyone Is Obsessing Over",
 ]
 
-# Tags for all pins
 TAGS = [
-    "Bathroom",
-    "Home",
-    "Home kitchen",
-    "Kitchen",
-    "Kitchen essentials",
-    "Kitchen Storage",
-    "Kitchen gadgets",
-    "Kitchen tools",
-    "Home Decor",
-    "Cooking tools",
-    "Outdoor",
-    "Flower",
+    "Bathroom", "Home", "HomeKitchen", "Kitchen",
+    "KitchenEssentials", "KitchenStorage", "KitchenGadgets",
+    "KitchenTools", "HomeDecor", "CookingTools", "Outdoor", "Flower",
 ]
 
-# Setup logging
 logging.basicConfig(
     filename=LOG_FILE,
     level=logging.INFO,
     format="%(asctime)s - %(levelname)s - %(message)s"
 )
 
-HEADERS_SCRAPER = {
-    "User-Agent": (
-        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
-        "AppleWebKit/537.36 (KHTML, like Gecko) "
-        "Chrome/120.0.0.0 Safari/537.36"
-    ),
-    "Accept-Language": "en-US,en;q=0.9",
-}
-
 POSTED_FILE = "posted.json"
+
+# Rotate user agents to avoid blocking
+USER_AGENTS = [
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
+    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36",
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:123.0) Gecko/20100101 Firefox/123.0",
+    "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+]
+
+
+def get_headers():
+    return {
+        "User-Agent": random.choice(USER_AGENTS),
+        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
+        "Accept-Language": "en-US,en;q=0.9",
+        "Accept-Encoding": "gzip, deflate, br",
+        "Connection": "keep-alive",
+        "Upgrade-Insecure-Requests": "1",
+        "Cache-Control": "max-age=0",
+        "TE": "trailers",
+    }
 
 
 def load_posted():
@@ -118,52 +119,104 @@ def save_posted(posted):
         json.dump(posted, f, indent=2)
 
 
+def extract_asin(url):
+    """Extract ASIN from Amazon URL."""
+    match = re.search(r'/dp/([A-Z0-9]{10})', url)
+    if match:
+        return match.group(1)
+    return None
+
+
+def get_amazon_image_via_asin(asin):
+    """Get Amazon product image using ASIN directly from image CDN."""
+    # Try multiple Amazon image URL formats
+    image_urls = [
+        f"https://m.media-amazon.com/images/P/{asin}.01._SCLZZZZZZZ_.jpg",
+        f"https://m.media-amazon.com/images/P/{asin}.01.LZZZZZZZ.jpg",
+        f"https://images-na.ssl-images-amazon.com/images/P/{asin}.01.LZZZZZZZ.jpg",
+    ]
+    for img_url in image_urls:
+        try:
+            resp = requests.head(img_url, timeout=10)
+            if resp.status_code == 200:
+                return img_url
+        except:
+            continue
+    return None
+
+
 def scrape_amazon(url):
     """Scrape title and image from Amazon product page."""
     try:
-        # Follow short link if needed
-        response = requests.get(url, headers=HEADERS_SCRAPER, timeout=15, allow_redirects=True)
-        if response.status_code != 200:
-            logging.warning(f"Failed to fetch {url} — Status: {response.status_code}")
-            return None, None
+        time.sleep(random.uniform(2, 4))
+        session = requests.Session()
+        response = session.get(url, headers=get_headers(), timeout=20, allow_redirects=True)
 
-        soup = BeautifulSoup(response.text, "html.parser")
-
-        # Title
-        title_tag = soup.find(id="productTitle")
-        title = title_tag.get_text(strip=True) if title_tag else None
-
-        # Image
+        title = None
         image_url = None
-        img_tag = soup.find(id="landingImage") or soup.find(id="imgBlkFront")
-        if img_tag:
-            image_url = img_tag.get("src") or img_tag.get("data-src")
 
+        if response.status_code == 200:
+            soup = BeautifulSoup(response.text, "html.parser")
+
+            # Get title
+            title_tag = soup.find(id="productTitle")
+            if title_tag:
+                title = title_tag.get_text(strip=True)
+
+            # Method 1: landingImage tag
+            img_tag = soup.find(id="landingImage") or soup.find(id="imgBlkFront")
+            if img_tag:
+                # Try data-old-hires first (highest quality)
+                image_url = img_tag.get("data-old-hires") or img_tag.get("src")
+
+            # Method 2: Parse JSON image data from scripts
+            if not image_url:
+                scripts = soup.find_all("script")
+                for script in scripts:
+                    text = str(script.string or "")
+                    if "colorImages" in text or "ImageBlockATF" in text:
+                        matches = re.findall(r'https://m\.media-amazon\.com/images/I/[^"\']+\.jpg', text)
+                        if matches:
+                            # Pick largest image
+                            best = max(matches, key=len)
+                            image_url = best
+                            break
+
+            # Method 3: og:image meta tag
+            if not image_url:
+                og_image = soup.find("meta", property="og:image")
+                if og_image:
+                    image_url = og_image.get("content")
+
+        # Method 4: Direct ASIN image CDN (fallback)
         if not image_url:
-            scripts = soup.find_all("script", type="text/javascript")
-            for script in scripts:
-                text = str(script)
-                if "colorImages" in text:
-                    start = text.find("https://m.media-amazon.com")
-                    if start != -1:
-                        end = text.find('"', start)
-                        image_url = text[start:end]
-                        break
+            asin = extract_asin(url)
+            if asin:
+                image_url = get_amazon_image_via_asin(asin)
 
         return title, image_url
 
     except Exception as e:
         logging.error(f"Amazon scrape error {url}: {e}")
+        # Last resort: try ASIN CDN
+        try:
+            asin = extract_asin(url)
+            if asin:
+                return None, get_amazon_image_via_asin(asin)
+        except:
+            pass
         return None, None
 
 
 def scrape_walmart(url):
     """Scrape title and image from Walmart product page."""
     try:
-        time.sleep(random.uniform(2, 5))
-        response = requests.get(url, headers=HEADERS_SCRAPER, timeout=15, allow_redirects=True)
+        time.sleep(random.uniform(2, 4))
+        session = requests.Session()
+        response = session.get(url, headers=get_headers(), timeout=20, allow_redirects=True)
+
         if response.status_code != 200:
-            logging.warning(f"Failed to fetch {url} — Status: {response.status_code}")
+            logging.warning(f"Walmart fetch failed {url} — {response.status_code}")
             return None, None
 
         soup = BeautifulSoup(response.text, "html.parser")
@@ -174,23 +227,27 @@ def scrape_walmart(url):
         if title_tag:
             title = title_tag.get_text(strip=True)
 
-        # Image
+        # Image — Method 1: meta og:image
         image_url = None
-        img_tag = soup.find("img", {"data-testid": "hero-image"}) or soup.find("img", {"class": "db"})
-        if img_tag:
-            image_url = img_tag.get("src")
+        og_image = soup.find("meta", property="og:image")
+        if og_image:
+            image_url = og_image.get("content")
 
-        # Try JSON data if image not found
+        # Method 2: JSON script tags
         if not image_url:
             scripts = soup.find_all("script", type="application/json")
             for script in scripts:
-                text = str(script)
-                if "imageInfo" in text or "productImageUrl" in text:
-                    start = text.find("https://i5.walmartimages.com")
-                    if start != -1:
-                        end = text.find('"', start)
-                        image_url = text[start:end]
-                        break
+                text = str(script.string or "")
+                matches = re.findall(r'https://i5\.walmartimages\.com/[^"\']+\.jpg', text)
+                if matches:
+                    image_url = matches[0]
+                    break
+
+        # Method 3: img tags
+        if not image_url:
+            img_tag = soup.find("img", {"data-testid": "hero-image"})
+            if img_tag:
+                image_url = img_tag.get("src")
 
         return title, image_url
 
@@ -201,14 +258,13 @@ def scrape_walmart(url):
 
 def create_pin(title, description, image_url, link):
     """Post a pin to Pinterest."""
-    url = "https://api.pinterest.com/v5/pins"
+    api_url = "https://api.pinterest.com/v5/pins"
     headers = {
         "Authorization": f"Bearer {PINTEREST_ACCESS_TOKEN}",
         "Content-Type": "application/json"
     }
 
-    # Add tags to description
-    tags_text = " ".join([f"#{tag.replace(' ', '')}" for tag in TAGS])
+    tags_text = " ".join([f"#{tag}" for tag in TAGS])
     full_description = f"{description}\n\n{tags_text}\n\n👉 Shop here: {link}"
 
     payload = {
@@ -222,17 +278,17 @@ def create_pin(title, description, image_url, link):
         }
     }
 
-    response = requests.post(url, headers=headers, json=payload)
+    response = requests.post(api_url, headers=headers, json=payload)
     if response.status_code in [200, 201]:
         logging.info(f"✅ Pin posted: {title[:50]}")
         return True
     else:
         logging.error(f"❌ Pin failed: {response.status_code} — {response.text}")
+        print(f"❌ Pinterest error: {response.status_code} — {response.text}")
         return False
 
 
 def load_products():
-    """Load products from CSV."""
     products = []
     with open(CSV_FILE, newline="", encoding="utf-8") as f:
         reader = csv.DictReader(f)
@@ -250,16 +306,13 @@ def run_scheduler():
 
     posted = load_posted()
     products = load_products()
-
-    # Filter not yet posted
     pending = [p for p in products if p["link"] not in posted]
 
     if not pending:
-        print("✅ All products already posted! Add more links to CSV.")
-        logging.info("No pending products.")
+        print("✅ All products posted! Add more links to CSV.")
         return
 
-    print(f"📦 {len(pending)} products pending | Posting up to {PINS_PER_RUN} this run")
+    print(f"📦 {len(pending)} pending | Posting up to {PINS_PER_RUN} this run")
 
     count = 0
     for product in pending:
@@ -286,10 +339,11 @@ def run_scheduler():
             continue
 
         if not image_url:
-            print(f"⚠️ Could not get image — skipping: {link}")
-            logging.warning(f"No image found: {link}")
+            print(f"⚠️ No image found — skipping: {link}")
+            logging.warning(f"No image: {link}")
             continue
 
+        print(f"🖼️ Image found!")
         print(f"📌 Posting: {pin_title[:60]}...")
         success = create_pin(pin_title, description, image_url, link)
 
@@ -300,10 +354,10 @@ def run_scheduler():
             print(f"✅ Pin {count}/{PINS_PER_RUN} posted!")
             time.sleep(DELAY_BETWEEN_PINS)
         else:
-            print(f"❌ Failed: {link}")
+            print(f"❌ Failed to post: {link}")
             time.sleep(10)
 
-    print(f"\n🎉 Scheduler finished! Total pins posted: {count}")
+    print(f"\n🎉 Done! Total pins posted: {count}")
     logging.info(f"Scheduler finished. Pins posted: {count}")
 
 
