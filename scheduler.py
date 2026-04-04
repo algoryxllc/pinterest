@@ -258,7 +258,7 @@ def scrape_walmart(url):
 
 def create_pin(title, description, image_url, link):
     """Post a pin to Pinterest."""
-    api_url = "https://api.pinterest.com/v5/pins"
+    api_url = "https://api-sandbox.pinterest.com/v5/pins"
     headers = {
         "Authorization": f"Bearer {PINTEREST_ACCESS_TOKEN}",
         "Content-Type": "application/json"
