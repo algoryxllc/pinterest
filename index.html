@@ -72,7 +72,6 @@
     transition: border 0.2s;
   }
   input:focus, textarea:focus, select:focus { border-color: var(--accent); }
-  textarea { resize: vertical; min-height: 80px; }
   select option { background: #1e1e22; }
 
   .niche-grid {
@@ -110,6 +109,8 @@
     color: var(--accent);
     margin-bottom: 10px;
   }
+
+  .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 
   .btn {
     display: inline-flex;
@@ -190,7 +191,6 @@
   #previewPane p { color: #ccc; font-size: 0.9rem; margin-bottom: 8px; }
   #previewPane a { color: var(--accent); text-decoration: none; font-size: 0.85rem; font-weight: 600; }
   #previewPane .prod-card { border: 1px solid var(--border); border-radius: 8px; padding: 14px; margin: 12px 0; }
-  #previewPane img { max-width: 120px; border-radius: 6px; margin-top: 8px; }
   #previewPane .disclosure { font-size: 0.78rem; color: var(--muted); margin-top: 20px; padding-top: 12px; border-top: 1px solid var(--border); }
 
   #htmlPane {
@@ -221,7 +221,7 @@
 
   <header>
     <h1>🏠 Home Finds Daily</h1>
-    <p>Blog Post Generator — Paste links, get a ready blog post</p>
+    <p>Blog Post Generator — Paste links & product names, get a ready blog post</p>
   </header>
 
   <!-- API Key -->
@@ -268,7 +268,6 @@
 </div>
 
 <script>
-// ---- DATA ----
 const TITLES = {
   home: ["Best Home Finds on Amazon Under $20","Viral Home Finds on Amazon Everyone's Buying","Must Have Home Finds on Amazon Right Now","Life Changing Home Finds on Amazon","Trending Home Finds on Amazon 2026","Hidden Gem Home Finds on Amazon Under $15","Top Home Finds on Amazon That Actually Work","Best Value Home Finds on Amazon This Year","Home Finds on Amazon Everyone Is Obsessing Over","Cheap Home Finds on Amazon That Look Expensive","Popular Home Finds on Amazon You Need","Home Finds on Amazon That Changed My Space","Amazon Home Finds That Save Time","Best Home Finds on Amazon Under $25","Viral Home Finds on Amazon Worth Buying","Must Try Home Finds on Amazon Right Now","Home Finds on Amazon With Amazing Reviews","Trending Home Finds on Amazon You Can't Miss","Home Finds on Amazon That Exceeded Expectations","Best Selling Home Finds on Amazon","Home Finds on Amazon Everyone Should Try","Affordable Home Finds on Amazon You'll Love","Top Rated Home Finds on Amazon 2026","Home Finds on Amazon That Made a Big Difference","Hidden Home Finds on Amazon Under $10","Home Finds on Amazon That Are Always Sold Out","Best Home Finds on Amazon for Small Spaces","Viral Home Finds on Amazon That Work Perfectly","Home Finds on Amazon You'll Repurchase","Must Have Home Finds on Amazon This Month"],
   kitchen: ["Best Kitchen Products on Amazon Under $25","Viral Kitchen Products on Amazon Everyone Loves","Must Have Kitchen Products on Amazon Right Now","Life Changing Kitchen Products on Amazon","Trending Kitchen Products on Amazon 2026","Hidden Gem Kitchen Products on Amazon Under $15","Top Kitchen Products on Amazon That Save Time","Best Value Kitchen Products on Amazon","Kitchen Products on Amazon Everyone Is Obsessing Over","Cheap Kitchen Products on Amazon That Perform Amazing","Popular Kitchen Products on Amazon You Need","Kitchen Products on Amazon That Changed My Cooking","Best Kitchen Gadgets on Amazon Right Now","Viral Kitchen Products on Amazon Worth Buying","Must Try Kitchen Products on Amazon Under $20","Kitchen Products on Amazon With Amazing Reviews","Trending Kitchen Products on Amazon You Can't Miss","Kitchen Products on Amazon That Exceeded Expectations","Best Selling Kitchen Products on Amazon","Kitchen Products on Amazon Everyone Should Try","Affordable Kitchen Products on Amazon You'll Love","Top Rated Kitchen Products on Amazon 2026","Kitchen Products on Amazon That I Use Daily","Hidden Kitchen Products on Amazon Under $10","Kitchen Products on Amazon That Are Always Sold Out","Best Kitchen Finds on Amazon This Year","Viral Kitchen Tools on Amazon Going Viral","Kitchen Products on Amazon You'll Repurchase","Must Have Kitchen Products on Amazon Under $30","Kitchen Products on Amazon That Actually Deliver"],
@@ -286,7 +285,6 @@ const INTROS = {
 let selectedNiche = 'home';
 let generatedHTML = '';
 
-// Build product rows
 function buildProductRows() {
   const grid = document.getElementById('productsGrid');
   grid.innerHTML = '';
@@ -294,15 +292,20 @@ function buildProductRows() {
     grid.innerHTML += `
       <div class="product-row">
         <div class="product-num">Product ${i}</div>
-        <label>Amazon Affiliate Link</label>
-        <input type="text" id="link${i}" placeholder="https://amzn.to/..." />
-        <label>Short Description / Bullet Points</label>
-        <textarea id="desc${i}" placeholder="e.g. Perfect for small kitchens. Saves counter space. Dishwasher safe."></textarea>
+        <div class="row2">
+          <div>
+            <label>Product Name</label>
+            <input type="text" id="name${i}" placeholder="e.g. Cat Food Topper for Picky Cats" />
+          </div>
+          <div>
+            <label>Amazon Affiliate Link</label>
+            <input type="text" id="link${i}" placeholder="https://amzn.to/..." />
+          </div>
+        </div>
       </div>`;
   }
 }
 
-// Niche selection
 document.querySelectorAll('.niche-btn').forEach(btn => {
   btn.addEventListener('click', () => {
     document.querySelectorAll('.niche-btn').forEach(b => b.classList.remove('active'));
@@ -351,11 +354,15 @@ async function generate() {
 
   const products = [];
   for (let i = 1; i <= 5; i++) {
+    const name = document.getElementById('name' + i).value.trim();
     const link = document.getElementById('link' + i).value.trim();
-    const desc = document.getElementById('desc' + i).value.trim();
-    if (link) products.push({ link, desc });
+    if (name && link) products.push({ name, link });
+    else if (name || link) {
+      setStatus(`❌ Product ${i}: Please fill both the product name and link, or leave both empty.`, 'error');
+      return;
+    }
   }
-  if (products.length === 0) { setStatus('❌ Add at least 1 product link.', 'error'); return; }
+  if (products.length === 0) { setStatus('❌ Add at least 1 product with a name and link.', 'error'); return; }
 
   const btn = document.getElementById('generateBtn');
   btn.disabled = true;
@@ -365,15 +372,17 @@ async function generate() {
   const blogTitle = pick(TITLES[selectedNiche]);
   const intro = pick(INTROS[selectedNiche]);
 
-  const productPrompt = products.map((p, i) => `Product ${i+1}:\nLink: ${p.link}\nNotes: ${p.desc || 'No notes provided'}`).join('\n\n');
+  const productPrompt = products.map((p, i) => `Product ${i+1}: ${p.name}`).join('\n');
 
-  const prompt = `You are a product blog writer. Given the following Amazon products, return a JSON array (no markdown, no backticks, just raw JSON array) with one object per product. Each object must have:
-- "title": A short catchy product name (max 6 words, no brand codes or brackets)
-- "description": 2 sentences max describing why someone would want this product. Use the notes provided.
+  const prompt = `You are a product blog writer for an Amazon affiliate blog. Write engaging, accurate descriptions for these products based on their names. Return a JSON array only (no markdown, no backticks, just raw valid JSON) with one object per product. Each object must have:
+- "title": A short catchy product title (max 6 words, based on the actual product name given)
+- "description": 2 sentences describing why someone would want this specific product. Be accurate to the product name provided.
 
 ${productPrompt}
 
-Return ONLY a valid JSON array. Example: [{"title":"Nonstick Frying Pan","description":"Perfect for everyday cooking. Easy to clean and PFOA free."}]`;
+IMPORTANT: Base your response strictly on the product names above. Do not make up unrelated products.
+
+Return ONLY a valid JSON array. Example: [{"title":"Cat Food Topper","description":"Perfect for picky eaters who need extra nutrition. Simply sprinkle over any dry or wet food."}]`;
 
   try {
     const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
@@ -394,9 +403,10 @@ Return ONLY a valid JSON array. Example: [{"title":"Nonstick Frying Pan","descri
     if (!res.ok) throw new Error(data.error?.message || 'Groq API error');
 
     const raw = data.choices[0].message.content.trim();
-    const parsed = JSON.parse(raw);
+    // Strip any accidental markdown fences
+    const cleaned = raw.replace(/```json|```/g, '').trim();
+    const parsed = JSON.parse(cleaned);
 
-    // Build HTML
     let html = `<h2>${blogTitle}</h2>\n<p>${intro}</p>\n\n`;
     let previewHTML = `<h2>${blogTitle}</h2><p style="color:#aaa;font-size:0.9rem;margin-bottom:16px;">${intro}</p>`;
 
