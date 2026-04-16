@@ -11,7 +11,6 @@
     --surface: #17171a;
     --border: #2a2a30;
     --accent: #f0a500;
-    --accent2: #e05c5c;
     --text: #f0ede8;
     --muted: #888;
     --green: #4caf7d;
@@ -32,12 +31,7 @@
     padding-bottom: 24px;
     border-bottom: 1px solid var(--border);
   }
-  header h1 {
-    font-family: 'Playfair Display', serif;
-    font-size: 2rem;
-    color: var(--accent);
-    letter-spacing: -0.5px;
-  }
+  header h1 { font-family: 'Playfair Display', serif; font-size: 2rem; color: var(--accent); }
   header p { color: var(--muted); margin-top: 6px; font-size: 0.9rem; }
 
   .card {
@@ -59,7 +53,7 @@
   label { display: block; font-size: 0.85rem; color: var(--muted); margin-bottom: 6px; margin-top: 14px; }
   label:first-of-type { margin-top: 0; }
 
-  input[type="text"], input[type="password"], textarea, select {
+  input[type="text"], input[type="password"] {
     width: 100%;
     background: var(--bg);
     border: 1px solid var(--border);
@@ -71,14 +65,9 @@
     outline: none;
     transition: border 0.2s;
   }
-  input:focus, textarea:focus, select:focus { border-color: var(--accent); }
-  select option { background: #1e1e22; }
+  input:focus { border-color: var(--accent); }
 
-  .niche-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 10px;
-  }
+  .niche-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
   .niche-btn {
     background: var(--bg);
     border: 1px solid var(--border);
@@ -101,16 +90,23 @@
     border-radius: 10px;
     padding: 14px;
   }
-  .product-num {
-    font-size: 0.7rem;
-    font-weight: 600;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    color: var(--accent);
-    margin-bottom: 10px;
-  }
+  .product-num { font-size: 0.7rem; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; color: var(--accent); margin-bottom: 10px; }
 
-  .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .product-preview {
+    display: none;
+    align-items: center;
+    gap: 12px;
+    margin-top: 10px;
+    padding: 10px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+  }
+  .product-preview img { width: 64px; height: 64px; object-fit: contain; border-radius: 6px; background: #fff; padding: 4px; flex-shrink: 0; }
+  .product-preview .prod-title { font-size: 0.82rem; color: var(--text); line-height: 1.4; }
+  .fetch-status { font-size: 0.75rem; margin-top: 4px; }
+  .fetch-status.ok { color: var(--green); }
+  .fetch-status.err { color: #e87a7a; }
 
   .btn {
     display: inline-flex;
@@ -131,18 +127,9 @@
     margin-top: 8px;
   }
   .btn:hover { opacity: 0.9; transform: translateY(-1px); }
-  .btn:active { transform: translateY(0); }
   .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
-  .btn-copy {
-    background: var(--green);
-    margin-top: 16px;
-  }
-  .btn-secondary {
-    background: transparent;
-    border: 1px solid var(--border);
-    color: var(--text);
-    margin-top: 8px;
-  }
+  .btn-copy { background: var(--green); margin-top: 16px; }
+  .btn-secondary { background: transparent; border: 1px solid var(--border); color: var(--text); margin-top: 8px; }
 
   .status {
     border-radius: 8px;
@@ -155,15 +142,8 @@
   .status.error { background: #2a1a1a; border: 1px solid #5a2a2a; color: #e87a7a; display: block; }
   .status.success { background: #1a2a1a; border: 1px solid #2a5a2a; color: #7ae87a; display: block; }
 
-  .output-area {
-    display: none;
-    margin-top: 20px;
-  }
-  .output-tabs {
-    display: flex;
-    gap: 8px;
-    margin-bottom: 12px;
-  }
+  .output-area { display: none; margin-top: 20px; }
+  .output-tabs { display: flex; gap: 8px; margin-bottom: 12px; }
   .tab-btn {
     background: var(--bg);
     border: 1px solid var(--border);
@@ -173,7 +153,6 @@
     font-family: 'DM Sans', sans-serif;
     font-size: 0.82rem;
     font-weight: 600;
-    letter-spacing: 0.5px;
     padding: 6px 14px;
     transition: all 0.2s;
   }
@@ -190,7 +169,9 @@
   #previewPane h3 { font-size: 1rem; color: var(--text); margin: 18px 0 6px; }
   #previewPane p { color: #ccc; font-size: 0.9rem; margin-bottom: 8px; }
   #previewPane a { color: var(--accent); text-decoration: none; font-size: 0.85rem; font-weight: 600; }
-  #previewPane .prod-card { border: 1px solid var(--border); border-radius: 8px; padding: 14px; margin: 12px 0; }
+  #previewPane .prod-card { border: 1px solid var(--border); border-radius: 8px; padding: 14px; margin: 12px 0; display: flex; gap: 14px; align-items: flex-start; }
+  #previewPane .prod-card img { width: 90px; height: 90px; object-fit: contain; border-radius: 6px; background: #fff; padding: 4px; flex-shrink: 0; }
+  #previewPane .prod-card .prod-info { flex: 1; }
   #previewPane .disclosure { font-size: 0.78rem; color: var(--muted); margin-top: 20px; padding-top: 12px; border-top: 1px solid var(--border); }
 
   #htmlPane {
@@ -214,6 +195,7 @@
   @keyframes spin { to { transform: rotate(360deg); } }
 
   .api-toggle { font-size: 0.78rem; color: var(--accent); cursor: pointer; float: right; }
+  .hint { font-size: 0.75rem; color: var(--muted); margin-top: 5px; }
 </style>
 </head>
 <body>
@@ -221,16 +203,14 @@
 
   <header>
     <h1>🏠 Home Finds Daily</h1>
-    <p>Blog Post Generator — Paste links & product names, get a ready blog post</p>
+    <p>Paste Amazon links — title & image load automatically, AI writes the blog</p>
   </header>
 
-  <!-- API Key -->
   <div class="card">
     <div class="card-title">🔑 Groq API Key <span class="api-toggle" onclick="toggleKey()">show/hide</span></div>
     <input type="password" id="apiKey" placeholder="Paste your Groq API key here..." />
   </div>
 
-  <!-- Niche -->
   <div class="card">
     <div class="card-title">📂 Select Niche</div>
     <div class="niche-grid">
@@ -241,23 +221,18 @@
     </div>
   </div>
 
-  <!-- Products -->
   <div class="card">
     <div class="card-title">📦 Products (up to 5)</div>
     <div class="products-grid" id="productsGrid"></div>
   </div>
 
-  <!-- Generate -->
-  <button class="btn" id="generateBtn" onclick="generate()">
-    ✨ Generate Blog Post
-  </button>
+  <button class="btn" id="generateBtn" onclick="generate()">✨ Generate Blog Post</button>
   <div class="status" id="status"></div>
 
-  <!-- Output -->
   <div class="output-area" id="outputArea">
     <div class="output-tabs">
-      <button class="tab-btn active" onclick="switchTab('preview')">👁 Preview</button>
-      <button class="tab-btn" onclick="switchTab('html')">📋 Copy HTML</button>
+      <button class="tab-btn active" onclick="switchTab('preview', event)">👁 Preview</button>
+      <button class="tab-btn" onclick="switchTab('html', event)">📋 HTML</button>
     </div>
     <div id="previewPane"></div>
     <div id="htmlPane" style="display:none;"></div>
@@ -266,43 +241,48 @@
   </div>
 
 </div>
-
 <script>
 const TITLES = {
-  home: ["Best Home Finds on Amazon Under $20","Viral Home Finds on Amazon Everyone's Buying","Must Have Home Finds on Amazon Right Now","Life Changing Home Finds on Amazon","Trending Home Finds on Amazon 2026","Hidden Gem Home Finds on Amazon Under $15","Top Home Finds on Amazon That Actually Work","Best Value Home Finds on Amazon This Year","Home Finds on Amazon Everyone Is Obsessing Over","Cheap Home Finds on Amazon That Look Expensive","Popular Home Finds on Amazon You Need","Home Finds on Amazon That Changed My Space","Amazon Home Finds That Save Time","Best Home Finds on Amazon Under $25","Viral Home Finds on Amazon Worth Buying","Must Try Home Finds on Amazon Right Now","Home Finds on Amazon With Amazing Reviews","Trending Home Finds on Amazon You Can't Miss","Home Finds on Amazon That Exceeded Expectations","Best Selling Home Finds on Amazon","Home Finds on Amazon Everyone Should Try","Affordable Home Finds on Amazon You'll Love","Top Rated Home Finds on Amazon 2026","Home Finds on Amazon That Made a Big Difference","Hidden Home Finds on Amazon Under $10","Home Finds on Amazon That Are Always Sold Out","Best Home Finds on Amazon for Small Spaces","Viral Home Finds on Amazon That Work Perfectly","Home Finds on Amazon You'll Repurchase","Must Have Home Finds on Amazon This Month"],
-  kitchen: ["Best Kitchen Products on Amazon Under $25","Viral Kitchen Products on Amazon Everyone Loves","Must Have Kitchen Products on Amazon Right Now","Life Changing Kitchen Products on Amazon","Trending Kitchen Products on Amazon 2026","Hidden Gem Kitchen Products on Amazon Under $15","Top Kitchen Products on Amazon That Save Time","Best Value Kitchen Products on Amazon","Kitchen Products on Amazon Everyone Is Obsessing Over","Cheap Kitchen Products on Amazon That Perform Amazing","Popular Kitchen Products on Amazon You Need","Kitchen Products on Amazon That Changed My Cooking","Best Kitchen Gadgets on Amazon Right Now","Viral Kitchen Products on Amazon Worth Buying","Must Try Kitchen Products on Amazon Under $20","Kitchen Products on Amazon With Amazing Reviews","Trending Kitchen Products on Amazon You Can't Miss","Kitchen Products on Amazon That Exceeded Expectations","Best Selling Kitchen Products on Amazon","Kitchen Products on Amazon Everyone Should Try","Affordable Kitchen Products on Amazon You'll Love","Top Rated Kitchen Products on Amazon 2026","Kitchen Products on Amazon That I Use Daily","Hidden Kitchen Products on Amazon Under $10","Kitchen Products on Amazon That Are Always Sold Out","Best Kitchen Finds on Amazon This Year","Viral Kitchen Tools on Amazon Going Viral","Kitchen Products on Amazon You'll Repurchase","Must Have Kitchen Products on Amazon Under $30","Kitchen Products on Amazon That Actually Deliver"],
-  beauty: ["Best Beauty & Skincare on Amazon Under $15","Viral Beauty & Skincare on Amazon Everyone Loves","Must Have Beauty & Skincare on Amazon Right Now","Life Changing Beauty & Skincare on Amazon","Trending Beauty & Skincare on Amazon 2026","Hidden Gem Beauty & Skincare on Amazon Under $20","Top Beauty & Skincare on Amazon That Actually Work","Best Value Beauty & Skincare on Amazon","Beauty & Skincare on Amazon Everyone Is Obsessing Over","Cheap Beauty & Skincare on Amazon That Deliver Results","Popular Beauty & Skincare on Amazon You Need","Beauty & Skincare on Amazon That Changed My Skin","Best Beauty Finds on Amazon Right Now","Viral Skincare on Amazon Worth Buying","Must Try Beauty & Skincare on Amazon Under $25","Beauty & Skincare on Amazon With Amazing Reviews","Trending Beauty & Skincare on Amazon You Can't Miss","Beauty & Skincare on Amazon That Exceeded Expectations","Best Selling Beauty & Skincare on Amazon","Beauty & Skincare on Amazon Everyone Should Try","Affordable Beauty & Skincare on Amazon You'll Love","Top Rated Beauty & Skincare on Amazon 2026","Beauty & Skincare on Amazon for Glowing Skin","Hidden Beauty & Skincare on Amazon Under $10","Beauty & Skincare on Amazon That Are Always Sold Out","Best Beauty Products on Amazon This Year","Viral Beauty & Skincare on Amazon Going Viral","Beauty & Skincare on Amazon You'll Repurchase","Must Have Beauty & Skincare on Amazon This Month","Beauty & Skincare on Amazon That Actually Work"],
-  decor: ["Best Home Decor on Amazon Under $30","Viral Home Decor on Amazon Everyone's Buying","Must Have Home Decor on Amazon Right Now","Life Changing Home Decor on Amazon","Trending Home Decor on Amazon 2026","Hidden Gem Home Decor on Amazon Under $15","Top Home Decor on Amazon That Look Expensive","Best Value Home Decor on Amazon This Year","Home Decor on Amazon Everyone Is Obsessing Over","Cheap Home Decor on Amazon That Looks Amazing","Popular Home Decor on Amazon You Need","Home Decor on Amazon That Transformed My Room","Best Home Decor Finds on Amazon Right Now","Viral Home Decor on Amazon Worth the Hype","Must Try Home Decor on Amazon Under $25","Home Decor on Amazon With Amazing Reviews","Trending Home Decor on Amazon You Can't Miss","Home Decor on Amazon That Exceeded Expectations","Best Selling Home Decor on Amazon","Home Decor on Amazon Everyone Should Try","Affordable Home Decor on Amazon You'll Love","Top Rated Home Decor on Amazon 2026","Home Decor on Amazon That Made a Big Difference","Hidden Home Decor on Amazon Under $10","Home Decor on Amazon That Are Always Sold Out","Best Home Decor on Amazon for Small Rooms","Viral Home Decor on Amazon Going Viral","Home Decor on Amazon You'll Repurchase","Must Have Home Decor on Amazon This Month","Home Decor on Amazon That Looks Expensive on Budget"]
+  home: ["Best Home Finds on Amazon Under $20","Viral Home Finds on Amazon Everyone's Buying","Must Have Home Finds on Amazon Right Now","Life Changing Home Finds on Amazon","Trending Home Finds on Amazon 2026","Hidden Gem Home Finds on Amazon Under $15","Top Home Finds on Amazon That Actually Work","Best Value Home Finds on Amazon This Year","Home Finds on Amazon Everyone Is Obsessing Over","Cheap Home Finds on Amazon That Look Expensive"],
+  kitchen: ["Best Kitchen Products on Amazon Under $25","Viral Kitchen Products on Amazon Everyone Loves","Must Have Kitchen Products on Amazon Right Now","Life Changing Kitchen Products on Amazon","Trending Kitchen Products on Amazon 2026","Top Kitchen Products on Amazon That Save Time","Best Value Kitchen Products on Amazon","Kitchen Products on Amazon Everyone Is Obsessing Over","Best Kitchen Gadgets on Amazon Right Now","Viral Kitchen Products on Amazon Worth Buying"],
+  beauty: ["Best Beauty & Skincare on Amazon Under $15","Viral Beauty & Skincare on Amazon Everyone Loves","Must Have Beauty & Skincare on Amazon Right Now","Life Changing Beauty & Skincare on Amazon","Trending Beauty & Skincare on Amazon 2026","Top Beauty & Skincare on Amazon That Actually Work","Best Value Beauty & Skincare on Amazon","Beauty & Skincare on Amazon Everyone Is Obsessing Over","Best Beauty Finds on Amazon Right Now","Viral Skincare on Amazon Worth Buying"],
+  decor: ["Best Home Decor on Amazon Under $30","Viral Home Decor on Amazon Everyone's Buying","Must Have Home Decor on Amazon Right Now","Life Changing Home Decor on Amazon","Trending Home Decor on Amazon 2026","Top Home Decor on Amazon That Look Expensive","Best Value Home Decor on Amazon This Year","Home Decor on Amazon Everyone Is Obsessing Over","Best Home Decor Finds on Amazon Right Now","Viral Home Decor on Amazon Worth the Hype"]
 };
-
 const INTROS = {
-  home: ["If you're tired of scrolling endlessly for useful stuff, these Amazon home finds might just solve that problem.","I've rounded up the most practical and clever home finds on Amazon that actually make daily life easier.","Looking for simple ways to upgrade your space without spending a fortune? These Amazon home finds deliver.","These aren't just random picks — these Amazon home finds are the ones people keep coming back to.","Want to make your home feel more organized and comfortable? Start with these hidden gems on Amazon.","From smart storage to everyday essentials, these Amazon home finds are changing how people live at home.","If you're always hunting for useful things that actually work, you'll want to see these Amazon home finds.","These Amazon home finds are the kind of buys that make you wonder why you didn't get them sooner.","Small changes can make a big difference. These affordable Amazon home finds prove exactly that.","Here are the most talked-about Amazon home finds that real people are loving right now."],
-  kitchen: ["Cooking and cleaning just got a lot easier thanks to these clever Amazon kitchen products.","If your kitchen needs a quiet upgrade, these Amazon kitchen products might be exactly what you need.","I tried dozens of gadgets so you don't have to — these Amazon kitchen products are the real winners.","From quick meals to easy cleanup, these Amazon kitchen products are making kitchens more efficient.","Looking for tools that actually save time in the kitchen? These Amazon finds are worth checking out.","These aren't fancy gadgets you'll use once — these Amazon kitchen products get used every single day.","Want to make cooking more fun and less stressful? Start with these popular Amazon kitchen products.","Simple, practical, and surprisingly affordable — here are the best Amazon kitchen products right now.","These Amazon kitchen products are the kind that make you say \"why didn't I buy this earlier?\"","If your kitchen routine needs a refresh, these smart Amazon kitchen products can help."],
-  beauty: ["Good skincare doesn't have to be expensive. These Amazon beauty and skincare finds prove it.","I've tested so many products, and these Amazon beauty and skincare finds actually deliver results.","Want glowing skin without complicated routines? These Amazon beauty and skincare picks keep it simple.","These Amazon beauty and skincare finds are the ones people quietly repurchase again and again.","From daily essentials to hidden gems, these Amazon beauty and skincare products are worth knowing about.","If you're tired of wasting money on products that don't work, try these Amazon beauty and skincare favorites.","Simple, effective, and budget-friendly — these are the Amazon beauty and skincare finds everyone's talking about.","Looking for skincare that fits easily into your routine? These Amazon finds might be your new go-to.","These Amazon beauty and skincare products are the kind that make you feel good without breaking the bank.","Ready to upgrade your beauty routine? These underrated Amazon beauty and skincare finds are a great place to start."],
-  decor: ["If your walls feel bare and your space feels empty, these Amazon home decor finds are the fix.","I've rounded up the most stylish and affordable home decor on Amazon that actually looks expensive.","Want to transform your room without a full renovation? These Amazon home decor picks make it easy.","These aren't just decorations — these Amazon home decor finds are conversation starters.","Looking for pieces that add personality to your space? These Amazon decor finds deliver every time.","From modern minimalist to cozy aesthetic, these Amazon home decor finds work for every style.","These Amazon home decor finds are the kind of buys that instantly make your home feel complete.","Small decor upgrades can transform a space. These affordable Amazon finds prove exactly that.","Here are the most loved Amazon home decor pieces that real people keep buying and gifting.","If your space needs a refresh, these trending Amazon home decor finds are a great place to start."]
+  home: ["If you're tired of scrolling endlessly for useful stuff, these Amazon home finds might just solve that problem.","These Amazon home finds are the kind of buys that make you wonder why you didn't get them sooner.","Small changes can make a big difference. These affordable Amazon home finds prove exactly that.","Here are the most talked-about Amazon home finds that real people are loving right now."],
+  kitchen: ["Cooking and cleaning just got a lot easier thanks to these clever Amazon kitchen products.","These Amazon kitchen products get used every single day — not just once and forgotten.","Simple, practical, and surprisingly affordable — here are the best Amazon kitchen products right now.","If your kitchen routine needs a refresh, these smart Amazon kitchen products can help."],
+  beauty: ["Good skincare doesn't have to be expensive. These Amazon beauty and skincare finds prove it.","These Amazon beauty and skincare finds are the ones people quietly repurchase again and again.","Simple, effective, and budget-friendly — these are the Amazon beauty finds everyone's talking about.","These Amazon beauty products make you feel good without breaking the bank."],
+  decor: ["If your space feels empty, these Amazon home decor finds are the fix.","Want to transform your room without a full renovation? These Amazon decor picks make it easy.","Small decor upgrades can transform a space. These affordable Amazon finds prove exactly that.","Here are the most loved Amazon home decor pieces that real people keep buying and gifting."]
 };
 
 let selectedNiche = 'home';
 let generatedHTML = '';
+const productData = {};
 
 function buildProductRows() {
   const grid = document.getElementById('productsGrid');
   grid.innerHTML = '';
   for (let i = 1; i <= 5; i++) {
     grid.innerHTML += `
-      <div class="product-row">
+      <div class="product-row" id="row${i}">
         <div class="product-num">Product ${i}</div>
-        <div class="row2">
+        <label>Amazon Affiliate Link</label>
+        <input type="text" id="link${i}" placeholder="https://amzn.to/... or full Amazon URL" />
+        <p class="hint">Paste link → click away → title & image load automatically</p>
+        <div class="product-preview" id="preview${i}">
+          <img id="img${i}" src="" alt="" onerror="this.style.display='none'" />
           <div>
-            <label>Product Name</label>
-            <input type="text" id="name${i}" placeholder="e.g. Cat Food Topper for Picky Cats" />
-          </div>
-          <div>
-            <label>Amazon Affiliate Link</label>
-            <input type="text" id="link${i}" placeholder="https://amzn.to/..." />
+            <div class="prod-title" id="ptitle${i}"></div>
+            <div class="fetch-status" id="fstatus${i}"></div>
           </div>
         </div>
       </div>`;
+
+    // attach blur listener after DOM settles
+    setTimeout(() => {
+      const inp = document.getElementById('link' + i);
+      if (inp) inp.addEventListener('blur', () => fetchProduct(i));
+    }, 0);
   }
 }
 
@@ -318,79 +298,166 @@ function toggleKey() {
   const k = document.getElementById('apiKey');
   k.type = k.type === 'password' ? 'text' : 'password';
 }
-
 function setStatus(msg, type) {
   const s = document.getElementById('status');
   s.textContent = msg;
   s.className = 'status ' + type;
 }
-
-function switchTab(tab) {
+function switchTab(tab, e) {
   document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-  event.target.classList.add('active');
+  e.target.classList.add('active');
   document.getElementById('previewPane').style.display = tab === 'preview' ? 'block' : 'none';
   document.getElementById('htmlPane').style.display = tab === 'html' ? 'block' : 'none';
 }
-
 function copyHTML() {
   navigator.clipboard.writeText(generatedHTML).then(() => {
-    setStatus('✅ HTML copied! Now open Blogger → New Post → Switch to HTML view → Paste → Publish', 'success');
+    setStatus('✅ Copied! Open Blogger → New Post → HTML view → Paste → Publish', 'success');
   });
 }
-
 function resetForm() {
   document.getElementById('outputArea').style.display = 'none';
   document.getElementById('status').className = 'status';
   window.scrollTo(0, 0);
 }
+function pick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
 
-function pick(arr) {
-  return arr[Math.floor(Math.random() * arr.length)];
+async function fetchProduct(i) {
+  const rawUrl = document.getElementById('link' + i).value.trim();
+  if (!rawUrl) return;
+
+  const previewEl = document.getElementById('preview' + i);
+  const titleEl   = document.getElementById('ptitle' + i);
+  const imgEl     = document.getElementById('img' + i);
+  const statusEl  = document.getElementById('fstatus' + i);
+
+  previewEl.style.display = 'flex';
+  imgEl.style.display = 'block';
+  titleEl.textContent = '⏳ Fetching...';
+  statusEl.textContent = '';
+  statusEl.className = 'fetch-status';
+
+  try {
+    // Use allorigins proxy — handles redirects from amzn.to automatically
+    const proxy = `https://api.allorigins.win/get?url=${encodeURIComponent(rawUrl)}`;
+    const res = await fetch(proxy);
+    if (!res.ok) throw new Error('Proxy error ' + res.status);
+    const json = await res.json();
+    const html = json.contents || '';
+    if (!html) throw new Error('Empty response from proxy');
+
+    // --- Extract title ---
+    let title = '';
+    // og:title is most reliable
+    const ogT = html.match(/<meta[^>]+property=["']og:title["'][^>]+content=["']([^"']{5,})["']/i)
+             || html.match(/<meta[^>]+content=["']([^"']{5,})["'][^>]+property=["']og:title["']/i);
+    if (ogT) title = ogT[1];
+    if (!title) {
+      const tagT = html.match(/<title[^>]*>([\s\S]*?)<\/title>/i);
+      if (tagT) title = tagT[1].replace(/\s*[:\-|]\s*Amazon\.(com|co\.\w+|in|de|fr|es|it).*$/i, '').trim();
+    }
+    title = title.replace(/&amp;/g,'&').replace(/&#(\d+);/g,(_,n)=>String.fromCharCode(n)).trim();
+    if (title.length > 130) title = title.substring(0, 130) + '...';
+
+    // --- Extract image ---
+    let image = '';
+    // Try og:image
+    const ogI = html.match(/<meta[^>]+property=["']og:image["'][^>]+content=["']([^"']+)["']/i)
+             || html.match(/<meta[^>]+content=["']([^"']+)["'][^>]+property=["']og:image["']/i);
+    if (ogI) image = ogI[1];
+
+    // Try data-old-hires (high-res Amazon main image)
+    if (!image) {
+      const hires = html.match(/data-old-hires=["']([^"']+\.jpg[^"']*)["']/i);
+      if (hires) image = hires[1];
+    }
+    // Try landingImage src
+    if (!image) {
+      const landing = html.match(/id=["']landingImage["'][^>]+src=["']([^"']+)["']/i);
+      if (landing) image = landing[1];
+    }
+    // Try imgTagWrapper img src
+    if (!image) {
+      const wrapper = html.match(/imgTagWrapper[\s\S]{0,300}?src=["']([^"']+\.jpg[^"']*)["']/i);
+      if (wrapper) image = wrapper[1];
+    }
+
+    if (!title) throw new Error('Could not parse product title');
+
+    productData[i] = { title, image, link: rawUrl };
+    titleEl.textContent = title;
+    statusEl.textContent = '✅ Loaded';
+    statusEl.className = 'fetch-status ok';
+
+    if (image) {
+      imgEl.src = image;
+    } else {
+      imgEl.style.display = 'none';
+      statusEl.textContent += ' (no image found)';
+    }
+
+  } catch (err) {
+    titleEl.textContent = 'Auto-fetch failed. Amazon blocked the request.';
+    statusEl.textContent = '⚠️ Type the product name manually below';
+    statusEl.className = 'fetch-status err';
+    productData[i] = { title: '', image: '', link: rawUrl };
+
+    // Add manual name input if not already there
+    if (!document.getElementById('manual' + i)) {
+      const inp = document.createElement('input');
+      inp.type = 'text';
+      inp.id = 'manual' + i;
+      inp.placeholder = 'Type product name manually (e.g. Cat Food Topper)...';
+      inp.style.marginTop = '8px';
+      inp.addEventListener('input', () => {
+        productData[i] = { ...productData[i], title: inp.value.trim() };
+      });
+      document.getElementById('row' + i).appendChild(inp);
+    }
+  }
 }
 
 async function generate() {
   const apiKey = document.getElementById('apiKey').value.trim();
-  if (!apiKey) { setStatus('❌ Please enter your Groq API key first.', 'error'); return; }
+  if (!apiKey) { setStatus('❌ Enter your Groq API key first.', 'error'); return; }
 
   const products = [];
   for (let i = 1; i <= 5; i++) {
-    const name = document.getElementById('name' + i).value.trim();
     const link = document.getElementById('link' + i).value.trim();
-    if (name && link) products.push({ name, link });
-    else if (name || link) {
-      setStatus(`❌ Product ${i}: Please fill both the product name and link, or leave both empty.`, 'error');
+    if (!link) continue;
+    const d = productData[i] || {};
+    const manualEl = document.getElementById('manual' + i);
+    const title = d.title || (manualEl ? manualEl.value.trim() : '');
+    if (!title) {
+      setStatus(`❌ Product ${i}: No title found. Wait for fetch or type manually.`, 'error');
       return;
     }
+    products.push({ title, image: d.image || '', link });
   }
-  if (products.length === 0) { setStatus('❌ Add at least 1 product with a name and link.', 'error'); return; }
+  if (products.length === 0) { setStatus('❌ Add at least 1 Amazon link.', 'error'); return; }
 
   const btn = document.getElementById('generateBtn');
   btn.disabled = true;
-  btn.innerHTML = '<span class="spinner"></span> Generating...';
-  setStatus('⏳ Talking to Groq AI...', 'info');
+  btn.innerHTML = '<span class="spinner"></span> Writing blog...';
+  setStatus('⏳ Groq AI is writing your blog post...', 'info');
 
   const blogTitle = pick(TITLES[selectedNiche]);
-  const intro = pick(INTROS[selectedNiche]);
+  const intro     = pick(INTROS[selectedNiche]);
+  const productPrompt = products.map((p, i) => `Product ${i+1}: ${p.title}`).join('\n');
 
-  const productPrompt = products.map((p, i) => `Product ${i+1}: ${p.name}`).join('\n');
+  const prompt = `You are an Amazon affiliate blog writer. Write accurate, engaging descriptions strictly based on the product names below.
 
-  const prompt = `You are a product blog writer for an Amazon affiliate blog. Write engaging, accurate descriptions for these products based on their names. Return a JSON array only (no markdown, no backticks, just raw valid JSON) with one object per product. Each object must have:
-- "title": A short catchy product title (max 6 words, based on the actual product name given)
-- "description": 2 sentences describing why someone would want this specific product. Be accurate to the product name provided.
+Return ONLY a raw valid JSON array. No markdown. No backticks. One object per product:
+- "title": Short catchy name (max 6 words, based on the actual product)
+- "description": 2 sentences about why someone would want this product. Be accurate.
 
 ${productPrompt}
 
-IMPORTANT: Base your response strictly on the product names above. Do not make up unrelated products.
-
-Return ONLY a valid JSON array. Example: [{"title":"Cat Food Topper","description":"Perfect for picky eaters who need extra nutrition. Simply sprinkle over any dry or wet food."}]`;
+Example output: [{"title":"Nonstick Ceramic Pan","description":"Cooks evenly without sticking. Easy to clean and PFOA free."}]`;
 
   try {
     const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer ' + apiKey
-      },
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + apiKey },
       body: JSON.stringify({
         model: 'llama-3.1-8b-instant',
         messages: [{ role: 'user', content: prompt }],
@@ -398,34 +465,32 @@ Return ONLY a valid JSON array. Example: [{"title":"Cat Food Topper","descriptio
         max_tokens: 800
       })
     });
-
     const data = await res.json();
-    if (!res.ok) throw new Error(data.error?.message || 'Groq API error');
+    if (!res.ok) throw new Error(data.error?.message || 'Groq error');
 
-    const raw = data.choices[0].message.content.trim();
-    // Strip any accidental markdown fences
-    const cleaned = raw.replace(/```json|```/g, '').trim();
-    const parsed = JSON.parse(cleaned);
+    const raw = data.choices[0].message.content.trim().replace(/```json|```/g, '').trim();
+    const parsed = JSON.parse(raw);
 
     let html = `<h2>${blogTitle}</h2>\n<p>${intro}</p>\n\n`;
     let previewHTML = `<h2>${blogTitle}</h2><p style="color:#aaa;font-size:0.9rem;margin-bottom:16px;">${intro}</p>`;
 
     parsed.forEach((prod, i) => {
-      const link = products[i].link;
-      html += `<h3>${i+1}. ${prod.title}</h3>\n<p>${prod.description}</p>\n<p><a href="${link}" target="_blank" rel="nofollow">✅ Check Price on Amazon →</a></p>\n\n`;
-      previewHTML += `<div class="prod-card"><h3>${i+1}. ${prod.title}</h3><p>${prod.description}</p><a href="${link}" target="_blank">✅ Check Price on Amazon →</a></div>`;
+      const { link, image } = products[i];
+      const imgTagHTML = image ? `<img src="${image}" alt="${prod.title}" style="max-width:200px;display:block;margin:8px 0;border-radius:8px;" />\n` : '';
+      const imgPreview = image ? `<img src="${image}" alt="${prod.title}" />` : '';
+
+      html += `<h3>${i+1}. ${prod.title}</h3>\n${imgTagHTML}<p>${prod.description}</p>\n<p><a href="${link}" target="_blank" rel="nofollow">✅ Check Price on Amazon →</a></p>\n\n`;
+      previewHTML += `<div class="prod-card">${imgPreview}<div class="prod-info"><h3>${i+1}. ${prod.title}</h3><p>${prod.description}</p><a href="${link}" target="_blank">✅ Check Price on Amazon →</a></div></div>`;
     });
 
-    const disclosure = `<p><em>Disclosure: This post contains affiliate links. I may earn a small commission at no extra cost to you.</em></p>`;
-    html += disclosure;
+    html += `<p><em>Disclosure: This post contains affiliate links. I may earn a small commission at no extra cost to you.</em></p>`;
     previewHTML += `<div class="disclosure">Disclosure: This post contains affiliate links. I may earn a small commission at no extra cost to you.</div>`;
 
     generatedHTML = html;
-
     document.getElementById('previewPane').innerHTML = previewHTML;
     document.getElementById('htmlPane').textContent = html;
     document.getElementById('outputArea').style.display = 'block';
-    setStatus('✅ Blog post ready! Copy HTML and paste into Blogger.', 'success');
+    setStatus('✅ Blog post ready!', 'success');
     document.getElementById('outputArea').scrollIntoView({ behavior: 'smooth' });
 
   } catch (err) {
